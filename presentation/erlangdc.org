@@ -1,0 +1,295 @@
+#+TITLE: Making erlang speak REST using Webmachine
+#+Author: Justin Kirby
+#+OPTIONS: ^:nil num:nil
+#+SETUPFILE: s5.org
+
+
+*
+
+  Justin Kirby
+
+  [[mailto:jkirby@voalte.com][jkirby@voalte.com]]
+
+  [[https://github.com/justinkirby][github.com/justinkirby]]
+
+  [[http://blogs.openaether.org/][blogs.openaether.org]]
+
+  [[http://voalte.com][voalte.com]]
+
+* What is REST?
+
+* REST is
+  Representational State Transfer
+
+* REST is
+
+
+  basic and axiomatic
+
+* Everyone does it wrong
+
+  Including me.
+
+* Webmachine
+
+  Justin Sheehy grokked REST, and made that into Webmachine
+
+  It removes the pain of figuring out how to do REST.
+
+  1. [[http://webmachine.basho.com/][http://webmachine.basho.com/]]
+  2. [[https://github.com/basho/webmachine/][https://github.com/basho/webmachine/]]
+
+* What webmachine is not
+
+  It is not django or rails.
+
+  - no ORM
+  - no cookie/session management
+  - no auth
+  - no templates
+
+* What webmachine is
+
+  - Makes the complex http state machine digestable
+  - Easy to do it right.
+  - Reasonable defaults that let you build incrementally
+
+
+* Three key concepts
+
+  - resource
+  - request
+  - response
+
+* Resource
+
+  a http fsm. you write functions to handle various states
+
+* Request
+
+  data from the client, it is a record. use the wrq module to access it
+
+* Response
+
+  the data you send back, use wrq to set that data
+
+* Get it
+
+  #+begin_src sh
+    git clone git://github.com/basho/webmachine.git
+  #+end_src
+
+
+* Create Skeleton
+  Webmachine provides a handy app generator.
+  #+begin_src sh
+    webmachine/scripts/new_webmachine.sh speakers
+  #+end_src
+
+* Tour of the generated app
+
+  - standard otp
+  - uses rebar (wrapped in a Makefile)
+  - priv/dispatch.conf
+  - src/speakers\_resource.erl
+
+
+* Dispatch.conf
+
+  This is the config file which determines where a request is sent.
+
+  It is run through =file:consult/1= so must be valid erlang terms
+
+  #+begin_src erlang
+    %% send any request to /some/path to your_module
+    {["some","path"], your_module, []}.
+  #+end_src
+* Dispatch.conf with a variable
+
+  Extracting variables from the url path
+
+  #+begin_src erlang
+    %% /path/anything to your module
+    {["path",'*'], your_module, []}.
+
+    %% but we can make easier by naming it
+    {["path",name], your_module, []}.
+  #+end_src
+
+  =name= becomes a key value pair in a proplist
+
+
+* Dispatch.conf extra args
+
+  Passing extra data to =init/1=
+
+  #+begin_src erlang
+  %% /path/anything to your module
+  {["path","special"], your_module, [special]}.
+  {["path",name], your_module, []}.
+  #+end_src
+
+  Will call init like
+  #+begin_src erlang
+    init([]) ->
+        {ok, undefined};
+    init([special]) ->
+        {ok, special}.
+
+  #+end_src
+
+
+* a barebones resource
+
+  The simplest, but no simpler
+
+  #+begin_src erlang
+    init([]) -> {ok, undefined}.
+
+    to_html(ReqData, State) ->
+        {"<html><body>Hello, new world</body></html>", ReqData, State}.
+
+  #+end_src
+
+* what is available?
+
+  | resource\_exists        | service\_available       | is\_authorized           | forbidden            |
+  | allow\_missing\_post    | malformed\_request       | uri\_too\_long           | known\_content\_type |
+  | valid\_content\_headers | valid\_entity\_length    | options                  | allowed\_methods     |
+  | delete\_resource        | delete\_completed        | post\_is\_create         | create\_path         |
+  | process\_post           | content\_types\_provided | content\_types\_accepted | charsets\_provided   |
+  | encodings\_provided     | variances                | is\_conflict             | multiple\_choices    |
+  | previously\_existed     | moved\_permanently       | moved\_temporarily       | last\_modified       |
+  | expires                 | generate\_etag           | finish\_request          |                      |
+
+* making it speak json
+
+  Tell webmachine you support application/json
+
+  #+begin_src erlang
+    content_types_provided(ReqData, State) ->
+        {[{"application/json",to_json}], ReqData, State}.
+
+    to_json(ReqData, State) ->
+        {<<"{'this':'is_json'}">>, ReqData, State};
+  #+end_src
+
+* what can it do?
+
+  Letting the world know what HTTP methods you support
+
+  #+begin_src erlang
+    allowed_methods(ReqData, State) ->
+        {['GET', 'PUT', 'DELETE'], ReqData, State}.
+  #+end_src
+
+* authentication
+
+  #+begin_src erlang
+    is_authorized(ReqData, State) ->
+        %% must return true or false
+        IsAuth = magic_auth_function(ReqData, State),
+        {IsAuth, ReqData, State}.
+  #+end_src
+
+* does it exist?
+  #+begin_src erlang
+    resource_exists(ReqData, State) ->
+        %% get the name from the path (remember dispatch.conf)
+        Name = wrq:path_info(name, ReqData),
+
+        %% some uber efficient bool check for existence
+        Exist = data_model:exist(Name),
+        {Exist, ReqData, State}.
+  #+end_src
+
+* send it back
+  #+begin_src erlang
+    to_json(ReqData, State) ->
+        Name = wrq:path_info(name, ReqData),
+
+        %% get data from your model
+        Data = data_model:read(Name),
+
+        %% it is a record so munge it into 'json'
+        Json = transmorgify(Data),
+
+        %% note: the 2 is really important!
+        {mochijson2:encode(Json), ReqData, State};
+
+  #+end_src
+
+
+* receiving data
+
+  #+begin_src erlang
+    content_types_accepted(ReqData, State) ->
+        {[{"application/json",from_json}], ReqData, State}.
+  #+end_src
+
+* is it good?
+  #+begin_src erlang
+    malformed_request(ReqData, State) ->
+        case wrq:method(ReqData) of
+            'PUT' ->
+                %% extract the body from the request
+                Body = wrq:req_body(ReqData),
+
+                %% validate the data we received
+                IsValid = data_model:validate(Body),
+
+                %% return true or false
+                {IsValid, ReqData, State};
+            _ ->
+                %% don't care about get or delete
+                {true, ReqData, State}
+        end.
+
+  #+end_src
+
+* store it
+  #+begin_src erlang
+    from_json(ReqData, State) ->
+        Body = wrq:req_body(ReqData),
+
+        %% decode json to erlang terms
+        Json = mochijson2:decode(Body),
+
+        %% transform erlang terms into usable record or proplist
+        Data = untransmorgify(Json),
+
+        %% store the data
+        data_model:create(Data),
+
+        %% it works!
+        {true, wrq:set_resp_body(<<"W00t">>,ReqData),State}.
+
+  #+end_src
+
+* oops, lets delete that
+  #+begin_src erlang
+    delete_resource(ReqData, State) ->
+        %% get the key to delete
+        Name = wrq:path_info(name, ReqData),
+
+        %% delete it
+        Deleted = data_model:delete(Name),
+
+        %% return true or false
+        {Deleted, ReqData, State}.
+  #+end_src
+
+* tracing is pretty (useful)
+
+  Turn tracing on
+  #+begin_src erlang
+    init([]) ->
+        {{trace, "/path/to/save/traces"}, undefined}.
+  #+end_src
+
+  Add a dispatch rule
+  #+begin_src erlang
+    wmtrace_resource:add_dispatch_rule("wmtrace", "/path/to/save/traces").
+  #+end_src
+
+  Visit [[http://localhost:8000/wmtrace]]

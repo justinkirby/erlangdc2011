@@ -1,0 +1,671 @@
+<?xml version="1.0" encoding="iso-8859-1"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+               "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<title>Making erlang speak REST using Webmachine</title>
+<meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
+<meta name="title" content="Making erlang speak REST using Webmachine"/>
+<meta name="generator" content="Org-mode"/>
+<meta name="generated" content="2011-12-02 00:16:45 EST"/>
+<meta name="author" content="Justin Kirby"/>
+<meta name="description" content=""/>
+<meta name="keywords" content=""/>
+<!-- configuration parameters --> <meta name='defaultView' content='slideshow' /> <meta name='controlVis' content='hidden' /> <!-- style sheet links --> <link rel='stylesheet' href='ui/default/slides.css' type='text/css' media='projection' id='slideProj' /> <link rel='stylesheet' href='ui/default/outline.css' type='text/css' media='screen' id='outlineStyle' /> <link rel='stylesheet' href='ui/default/print.css' type='text/css' media='print' id='slidePrint' /> <link rel='stylesheet' href='ui/default/opera.css' type='text/css' media='projection' id='operaFix' /><!-- S5 JS --> <script src='ui/jquery.js' type='text/javascript'></script> <script src='ui/org-slides.js' type='text/javascript'></script> <script src='ui/default/slides.js' type='text/javascript'></script> <script src='ui/default/style.js' type='text/javascript'></script>
+<script type="text/javascript">
+<!--/*--><![CDATA[/*><!--*/
+ function CodeHighlightOn(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(null != target) {
+     elem.cacheClassElem = elem.className;
+     elem.cacheClassTarget = target.className;
+     target.className = "code-highlighted";
+     elem.className   = "code-highlighted";
+   }
+ }
+ function CodeHighlightOff(elem, id)
+ {
+   var target = document.getElementById(id);
+   if(elem.cacheClassElem)
+     elem.className = elem.cacheClassElem;
+   if(elem.cacheClassTarget)
+     target.className = elem.cacheClassTarget;
+ }
+/*]]>*///-->
+</script>
+
+</head>
+<body>
+
+<div id="preamble">
+<div class='layout'><div id='controls'></div><div id='currentSlide'></div><div id='header'></div><div id='footer'></div></div><div class='presentation'><div class='slide front'>  <div id='front-logo'></div><h1 class='front'></h1><h3></h3></div>
+</div>
+
+<div id="content">
+<h1 class="title">Making erlang speak REST using Webmachine</h1>
+
+
+
+<div id="outline-container-1" class="outline-2">
+<h2 id="sec-1"></h2>
+<div class="outline-text-2" id="text-1">
+
+
+<p>
+  Justin Kirby
+</p>
+<p>
+  <a href="mailto:jkirby@voalte.com">jkirby@voalte.com</a>
+</p>
+<p>
+  <a href="https://github.com/justinkirby">github.com/justinkirby</a>
+</p>
+<p>
+  <a href="http://blogs.openaether.org/">blogs.openaether.org</a>
+</p>
+<p>
+  <a href="http://voalte.com">voalte.com</a>
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-2" class="outline-2">
+<h2 id="sec-2">What is REST?</h2>
+<div class="outline-text-2" id="text-2">
+
+
+</div>
+
+</div>
+
+<div id="outline-container-3" class="outline-2">
+<h2 id="sec-3">REST is</h2>
+<div class="outline-text-2" id="text-3">
+
+<p>  Representational State Transfer
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-4" class="outline-2">
+<h2 id="sec-4">REST is</h2>
+<div class="outline-text-2" id="text-4">
+
+
+
+<p>
+  basic and axiomatic
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-5" class="outline-2">
+<h2 id="sec-5">Everyone does it wrong</h2>
+<div class="outline-text-2" id="text-5">
+
+
+<p>
+  Including me.
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-6" class="outline-2">
+<h2 id="sec-6">Webmachine</h2>
+<div class="outline-text-2" id="text-6">
+
+
+<p>
+  Justin Sheehy grokked REST, and made that into Webmachine
+</p>
+<p>
+  It removes the pain of figuring out how to do REST.
+</p>
+<ol>
+<li><a href="http://webmachine.basho.com/">http://webmachine.basho.com/</a>
+</li>
+<li><a href="https://github.com/basho/webmachine/">https://github.com/basho/webmachine/</a>
+</li>
+</ol>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-7" class="outline-2">
+<h2 id="sec-7">What webmachine is not</h2>
+<div class="outline-text-2" id="text-7">
+
+
+<p>
+  It is not django or rails.
+</p>
+<ul>
+<li>no ORM
+</li>
+<li>no cookie/session management
+</li>
+<li>no auth
+</li>
+<li>no templates
+</li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-8" class="outline-2">
+<h2 id="sec-8">What webmachine is</h2>
+<div class="outline-text-2" id="text-8">
+
+
+<ul>
+<li>Makes the complex http state machine digestable
+</li>
+<li>Easy to do it right.
+</li>
+<li>Reasonable defaults that let you build incrementally
+</li>
+</ul>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-9" class="outline-2">
+<h2 id="sec-9">Three key concepts</h2>
+<div class="outline-text-2" id="text-9">
+
+
+<ul>
+<li>resource
+</li>
+<li>request
+</li>
+<li>response
+</li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-10" class="outline-2">
+<h2 id="sec-10">Resource</h2>
+<div class="outline-text-2" id="text-10">
+
+
+<p>
+  a http fsm. you write functions to handle various states
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-11" class="outline-2">
+<h2 id="sec-11">Request</h2>
+<div class="outline-text-2" id="text-11">
+
+
+<p>
+  data from the client, it is a record. use the wrq module to access it
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-12" class="outline-2">
+<h2 id="sec-12">Response</h2>
+<div class="outline-text-2" id="text-12">
+
+
+<p>
+  the data you send back, use wrq to set that data
+</p>
+</div>
+
+</div>
+
+<div id="outline-container-13" class="outline-2">
+<h2 id="sec-13">Get it</h2>
+<div class="outline-text-2" id="text-13">
+
+
+
+
+
+<pre class="src src-sh">git clone git://github.com/basho/webmachine.git
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-14" class="outline-2">
+<h2 id="sec-14">Create Skeleton</h2>
+<div class="outline-text-2" id="text-14">
+
+<p>  Webmachine provides a handy app generator.
+</p>
+
+
+<pre class="src src-sh">webmachine/scripts/new_webmachine.sh speakers
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-15" class="outline-2">
+<h2 id="sec-15">Tour of the generated app</h2>
+<div class="outline-text-2" id="text-15">
+
+
+<ul>
+<li>standard otp
+</li>
+<li>uses rebar (wrapped in a Makefile)
+</li>
+<li>priv/dispatch.conf
+</li>
+<li>src/speakers_resource.erl
+</li>
+</ul>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-16" class="outline-2">
+<h2 id="sec-16">Dispatch.conf</h2>
+<div class="outline-text-2" id="text-16">
+
+
+<p>
+  This is the config file which determines where a request is sent.
+</p>
+<p>
+  It is run through <code>file:consult/1</code> so must be valid erlang terms
+</p>
+
+
+
+<pre class="src src-erlang">%% <span style="font-style: italic;">send any request to /some/path to your_module</span>
+{[<span style="color: #ad7fa8;">"some"</span>,<span style="color: #ad7fa8;">"path"</span>], your_module, []}.
+</pre>
+
+</div>
+
+</div>
+
+<div id="outline-container-17" class="outline-2">
+<h2 id="sec-17">Dispatch.conf with a variable</h2>
+<div class="outline-text-2" id="text-17">
+
+
+<p>
+  Extracting variables from the url path
+</p>
+
+
+
+<pre class="src src-erlang">%% <span style="font-style: italic;">/path/anything to your module</span>
+{[<span style="color: #ad7fa8;">"path"</span>,<span style="color: #ad7fa8;">'*'</span>], your_module, []}.
+
+%% <span style="font-style: italic;">but we can make easier by naming it</span>
+{[<span style="color: #ad7fa8;">"path"</span>,name], your_module, []}.
+</pre>
+
+
+<p>
+  <code>name</code> becomes a key value pair in a proplist
+</p>
+
+</div>
+
+</div>
+
+<div id="outline-container-18" class="outline-2">
+<h2 id="sec-18">Dispatch.conf extra args</h2>
+<div class="outline-text-2" id="text-18">
+
+
+<p>
+  Passing extra data to <code>init/1</code>
+</p>
+
+
+
+<pre class="src src-erlang">%% <span style="font-style: italic;">/path/anything to your module</span>
+{[<span style="color: #ad7fa8;">"path"</span>,<span style="color: #ad7fa8;">"special"</span>], your_module, [special]}.
+{[<span style="color: #ad7fa8;">"path"</span>,name], your_module, []}.
+</pre>
+
+
+<p>
+  Will call init like
+</p>
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">init</span>([]) -&gt;
+    {ok, undefined};
+<span style="color: #edd400; font-weight: bold;">init</span>([special]) -&gt;
+    {ok, special}.
+
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-19" class="outline-2">
+<h2 id="sec-19">a barebones resource</h2>
+<div class="outline-text-2" id="text-19">
+
+
+<p>
+  The simplest, but no simpler
+</p>
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">init</span>([]) -&gt;<span style="color: #edd400; font-weight: bold;"> </span>{ok, #<span style="font-weight: bold;">state</span>{}}.
+
+<span style="color: #edd400; font-weight: bold;">to_html</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    {<span style="color: #ad7fa8;">"&lt;html&gt;&lt;body&gt;Hello, new world&lt;/body&gt;&lt;/html&gt;"</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-20" class="outline-2">
+<h2 id="sec-20">what is available?</h2>
+<div class="outline-text-2" id="text-20">
+
+
+<table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
+<caption></caption>
+<colgroup><col class="left" /><col class="left" /><col class="left" /><col class="left" />
+</colgroup>
+<tbody>
+<tr><td class="left">resource_exists</td><td class="left">service_available</td><td class="left">is_authorized</td><td class="left">forbidden</td></tr>
+<tr><td class="left">allow_missing_post</td><td class="left">malformed_request</td><td class="left">uri_too_long</td><td class="left">known_content_type</td></tr>
+<tr><td class="left">valid_content_headers</td><td class="left">valid_entity_length</td><td class="left">options</td><td class="left">allowed_methods</td></tr>
+<tr><td class="left">delete_resource</td><td class="left">delete_completed</td><td class="left">post_is_create</td><td class="left">create_path</td></tr>
+<tr><td class="left">process_post</td><td class="left">content_types_provided</td><td class="left">content_types_accepted</td><td class="left">charsets_provided</td></tr>
+<tr><td class="left">encodings_provided</td><td class="left">variances</td><td class="left">is_conflict</td><td class="left">multiple_choices</td></tr>
+<tr><td class="left">previously_existed</td><td class="left">moved_permanently</td><td class="left">moved_temporarily</td><td class="left">last_modified</td></tr>
+<tr><td class="left">expires</td><td class="left">generate_etag</td><td class="left">finish_request</td><td class="left"></td></tr>
+</tbody>
+</table>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-21" class="outline-2">
+<h2 id="sec-21">making it speak json</h2>
+<div class="outline-text-2" id="text-21">
+
+
+<p>
+  Tell webmachine you support application/json
+</p>
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">content_types_provided</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    {[{<span style="color: #ad7fa8;">"application/json"</span>,to_json}], <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+
+<span style="color: #edd400; font-weight: bold;">to_json</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    {&lt;&lt;<span style="color: #ad7fa8;">"{'this':'is_json'}"</span>&gt;&gt;, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>};
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-22" class="outline-2">
+<h2 id="sec-22">what can it do?</h2>
+<div class="outline-text-2" id="text-22">
+
+
+<p>
+  Letting the world know what HTTP methods you support
+</p>
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">allowed_methods</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    {[<span style="color: #ad7fa8;">'GET'</span>, <span style="color: #ad7fa8;">'PUT'</span>, <span style="color: #ad7fa8;">'DELETE'</span>], <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-23" class="outline-2">
+<h2 id="sec-23">authentication</h2>
+<div class="outline-text-2" id="text-23">
+
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">is_authorized</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    %% <span style="font-style: italic;">must return true or false</span>
+    <span style="color: #ef2929;">IsAuth</span> = <span style="font-weight: bold;">magic_auth_function</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>),
+    {<span style="color: #ef2929;">IsAuth</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-24" class="outline-2">
+<h2 id="sec-24">does it exist?</h2>
+<div class="outline-text-2" id="text-24">
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">resource_exists</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    %% <span style="font-style: italic;">get the name from the path (remember dispatch.conf)</span>
+    <span style="color: #ef2929;">Name</span> = <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">path_info</span>(name, <span style="color: #ef2929;">ReqData</span>),
+
+    %% <span style="font-style: italic;">some uber efficient bool check for existence</span>
+    <span style="color: #ef2929;">Exist</span> = <span style="font-weight: bold;">data_model</span>:<span style="font-weight: bold;">exist</span>(<span style="color: #ef2929;">Name</span>),
+    {<span style="color: #ef2929;">Exist</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-25" class="outline-2">
+<h2 id="sec-25">send it back</h2>
+<div class="outline-text-2" id="text-25">
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">to_json</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    <span style="color: #ef2929;">Name</span> = <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">path_info</span>(name, <span style="color: #ef2929;">ReqData</span>),
+
+    %% <span style="font-style: italic;">get data from your model</span>
+    <span style="color: #ef2929;">Data</span> = <span style="font-weight: bold;">data_model</span>:<span style="font-weight: bold;">read</span>(<span style="color: #ef2929;">Name</span>),
+
+    %% <span style="font-style: italic;">it is a record so munge it into 'json'</span>
+    <span style="color: #ef2929;">Json</span> = <span style="font-weight: bold;">transmorgify</span>(<span style="color: #ef2929;">Data</span>),
+
+    %% <span style="font-style: italic;">note: the 2 is really important!</span>
+    {<span style="font-weight: bold;">mochijson2</span>:<span style="font-weight: bold;">encode</span>(<span style="color: #ef2929;">Json</span>), <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>};
+
+</pre>
+
+
+
+</div>
+
+</div>
+
+<div id="outline-container-26" class="outline-2">
+<h2 id="sec-26">receiving data</h2>
+<div class="outline-text-2" id="text-26">
+
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">content_types_accepted</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    {[{<span style="color: #ad7fa8;">"application/json"</span>,from_json}], <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-27" class="outline-2">
+<h2 id="sec-27">is it good?</h2>
+<div class="outline-text-2" id="text-27">
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">malformed_request</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    <span style="font-weight: bold;">case</span> <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">method</span>(<span style="color: #ef2929;">ReqData</span>) <span style="font-weight: bold;">of</span>
+        <span style="color: #ad7fa8;">'PUT'</span> -&gt;
+            %% <span style="font-style: italic;">extract the body from the request</span>
+            <span style="color: #ef2929;">Body</span> = <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">req_body</span>(<span style="color: #ef2929;">ReqData</span>),
+
+            %% <span style="font-style: italic;">validate the data we received</span>
+            <span style="color: #ef2929;">IsValid</span> = <span style="font-weight: bold;">data_model</span>:<span style="font-weight: bold;">validate</span>(<span style="color: #ef2929;">Body</span>),
+
+            %% <span style="font-style: italic;">return true or false</span>
+            {<span style="color: #ef2929;">IsValid</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>};
+        <span style="color: #ef2929;">_</span> -&gt;
+            %% <span style="font-style: italic;">don't care about get or delete</span>
+            {true, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}
+    <span style="font-weight: bold;">end</span>.
+
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-28" class="outline-2">
+<h2 id="sec-28">store it</h2>
+<div class="outline-text-2" id="text-28">
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">from_json</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    <span style="color: #ef2929;">Body</span> = <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">req_body</span>(<span style="color: #ef2929;">ReqData</span>),
+
+    %% <span style="font-style: italic;">decode json to erlang terms</span>
+    <span style="color: #ef2929;">Json</span> = <span style="font-weight: bold;">mochijson2</span>:<span style="font-weight: bold;">decode</span>(<span style="color: #ef2929;">Body</span>),
+
+    %% <span style="font-style: italic;">transform erlang terms into usable record or proplist</span>
+    <span style="color: #ef2929;">Data</span> = <span style="font-weight: bold;">untransmorgify</span>(<span style="color: #ef2929;">Json</span>),
+
+    %% <span style="font-style: italic;">store the data</span>
+    <span style="font-weight: bold;">data_model</span>:<span style="font-weight: bold;">create</span>(<span style="color: #ef2929;">Data</span>),
+
+    %% <span style="font-style: italic;">it works!</span>
+    {true, <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">set_resp_body</span>(&lt;&lt;<span style="color: #ad7fa8;">"W00t"</span>&gt;&gt;,<span style="color: #ef2929;">ReqData</span>),<span style="color: #ef2929;">State</span>}.
+
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-29" class="outline-2">
+<h2 id="sec-29">oops, lets delete that</h2>
+<div class="outline-text-2" id="text-29">
+
+
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">delete_resource</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
+    %% <span style="font-style: italic;">get the key to delete</span>
+    <span style="color: #ef2929;">Name</span> = <span style="font-weight: bold;">wrq</span>:<span style="font-weight: bold;">path_info</span>(name, <span style="color: #ef2929;">ReqData</span>),
+
+    %% <span style="font-style: italic;">delete it</span>
+    <span style="color: #ef2929;">Deleted</span> = <span style="font-weight: bold;">data_model</span>:<span style="font-weight: bold;">delete</span>(<span style="color: #ef2929;">Name</span>),
+
+    %% <span style="font-style: italic;">return true or false</span>
+    {<span style="color: #ef2929;">Deleted</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+</pre>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-30" class="outline-2">
+<h2 id="sec-30">tracing is pretty (useful)</h2>
+<div class="outline-text-2" id="text-30">
+
+
+<p>
+  Turn tracing on
+</p>
+
+
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">init</span>([]) -&gt;
+    {{trace, <span style="color: #ad7fa8;">"/path/to/save/traces"</span>}, undefined}.
+</pre>
+
+
+<p>
+  Add a dispatch rule
+</p>
+
+
+<pre class="src src-erlang"><span style="font-weight: bold;">wmtrace_resource</span>:<span style="font-weight: bold;">add_dispatch_rule</span>(<span style="color: #ad7fa8;">"wmtrace"</span>, <span style="color: #ad7fa8;">"/path/to/save/traces"</span>).
+</pre>
+
+
+<p>
+  Visit <a href="http://localhost:8000/wmtrace">http://localhost:8000/wmtrace</a>
+</p></div>
+</div>
+</div>
+
+<div id="postamble">
+</div>
+</div>
+</body>
+</html>

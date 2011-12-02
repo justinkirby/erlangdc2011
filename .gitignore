@@ -1,0 +1,4 @@
+speakers/deps
+speakers/ebin
+speakers/priv/log
+speakers/trace
