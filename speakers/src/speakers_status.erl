@@ -52,6 +52,8 @@ make_status(Pl) ->
     End = date_secs(proplists:get_value(<<"end">>,Pl)),
     Start = date_secs(proplists:get_value(<<"start">>,Pl)),
 
+    ?DEBUG("start: ~p  end: ~p now: ~p~n",[Start, End,Now]),
+
     Status = case Start > Now of
                  true ->
                      waiting;
@@ -64,7 +66,7 @@ make_status(Pl) ->
                      end
              end,
 
-    {proplists:get_value(<<"name">>, Pl), Status}.
+    {list_to_binary(http_uri:encode(binary_to_list(proplists:get_value(<<"name">>, Pl)))), Status}.
 
 
 now_secs() ->
@@ -73,3 +75,4 @@ now_secs() ->
 
 date_secs(Date) ->
     calendar:datetime_to_gregorian_seconds(httpd_util:convert_request_date(binary_to_list(Date))).
+

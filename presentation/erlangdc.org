@@ -50,7 +50,7 @@
 
 * What webmachine is
 
-  - Makes the complex http state machine digestable
+  - Makes the complex http state machine digestible
   - Easy to do it right.
   - Reasonable defaults that let you build incrementally
 
@@ -63,15 +63,21 @@
 
 * Resource
 
-  a http fsm. you write functions to handle various states
+  a gen\_fsm for http.
+
+  you write functions to handle various states
 
 * Request
 
-  data from the client, it is a record. use the wrq module to access it
+  data from the client as a record.
+
+  use the wrq module to access it.
 
 * Response
 
-  the data you send back, use wrq to set that data
+  the data you send back, status, headers, body, etc...
+
+  use wrq to set the data
 
 * Get it
 
@@ -94,7 +100,7 @@
   - src/speakers\_resource.erl
 
 
-* Dispatch.conf
+* priv/dispatch.conf
 
   This is the config file which determines where a request is sent.
 
@@ -104,7 +110,8 @@
     %% send any request to /some/path to your_module
     {["some","path"], your_module, []}.
   #+end_src
-* Dispatch.conf with a variable
+
+* priv/dispatch.conf with a variable
 
   Extracting variables from the url path
 
@@ -119,14 +126,16 @@
   =name= becomes a key value pair in a proplist
 
 
-* Dispatch.conf extra args
+* priv/dispatch.conf extra args
 
   Passing extra data to =init/1=
 
   #+begin_src erlang
-  %% /path/anything to your module
-  {["path","special"], your_module, [special]}.
-  {["path",name], your_module, []}.
+    %% /path/special to your module with init arg of [special]
+    {["path","special"], your_module, [special]}.
+
+    %% /path/anything to your_module with init arg of []
+    {["path",name], your_module, []}.
   #+end_src
 
   Will call init like
@@ -139,7 +148,7 @@
   #+end_src
 
 
-* a barebones resource
+* a bare bones resource
 
   The simplest, but no simpler
 
@@ -147,9 +156,21 @@
     init([]) -> {ok, undefined}.
 
     to_html(ReqData, State) ->
-        {"<html><body>Hello, new world</body></html>", ReqData, State}.
+        {
+          "<html><body>Hello, new world</body></html>",
+          ReqData,
+          State
+        }.
 
   #+end_src
+
+* consistent interface
+
+  - all resource funs take two args request record and State
+  - all resource funs return a three element tuple
+    1. resource specific response, usually true/false
+    2. Request Response record
+    3. State
 
 * what is available?
 

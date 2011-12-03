@@ -7,7 +7,7 @@
 <meta http-equiv="Content-Type" content="text/html;charset=iso-8859-1"/>
 <meta name="title" content="Making erlang speak REST using Webmachine"/>
 <meta name="generator" content="Org-mode"/>
-<meta name="generated" content="2011-12-02 00:16:45 EST"/>
+<meta name="generated" content="2011-12-03 12:37:00 EST"/>
 <meta name="author" content="Justin Kirby"/>
 <meta name="description" content=""/>
 <meta name="keywords" content=""/>
@@ -168,7 +168,7 @@
 
 
 <ul>
-<li>Makes the complex http state machine digestable
+<li>Makes the complex http state machine digestible
 </li>
 <li>Easy to do it right.
 </li>
@@ -207,7 +207,10 @@
 
 
 <p>
-  a http fsm. you write functions to handle various states
+  a gen_fsm for http.
+</p>
+<p>
+  you write functions to handle various states
 </p>
 </div>
 
@@ -219,7 +222,10 @@
 
 
 <p>
-  data from the client, it is a record. use the wrq module to access it
+  data from the client as a record.
+</p>
+<p>
+  use the wrq module to access it.
 </p>
 </div>
 
@@ -231,7 +237,10 @@
 
 
 <p>
-  the data you send back, use wrq to set that data
+  the data you send back, status, headers, body, etc&hellip;
+</p>
+<p>
+  use wrq to set the data
 </p>
 </div>
 
@@ -293,7 +302,7 @@
 </div>
 
 <div id="outline-container-16" class="outline-2">
-<h2 id="sec-16">Dispatch.conf</h2>
+<h2 id="sec-16">priv/dispatch.conf</h2>
 <div class="outline-text-2" id="text-16">
 
 
@@ -310,12 +319,13 @@
 {[<span style="color: #ad7fa8;">"some"</span>,<span style="color: #ad7fa8;">"path"</span>], your_module, []}.
 </pre>
 
+
 </div>
 
 </div>
 
 <div id="outline-container-17" class="outline-2">
-<h2 id="sec-17">Dispatch.conf with a variable</h2>
+<h2 id="sec-17">priv/dispatch.conf with a variable</h2>
 <div class="outline-text-2" id="text-17">
 
 
@@ -342,7 +352,7 @@
 </div>
 
 <div id="outline-container-18" class="outline-2">
-<h2 id="sec-18">Dispatch.conf extra args</h2>
+<h2 id="sec-18">priv/dispatch.conf extra args</h2>
 <div class="outline-text-2" id="text-18">
 
 
@@ -352,8 +362,10 @@
 
 
 
-<pre class="src src-erlang">%% <span style="font-style: italic;">/path/anything to your module</span>
+<pre class="src src-erlang">%% <span style="font-style: italic;">/path/special to your module with init arg of [special]</span>
 {[<span style="color: #ad7fa8;">"path"</span>,<span style="color: #ad7fa8;">"special"</span>], your_module, [special]}.
+
+%% <span style="font-style: italic;">/path/anything to your_module with init arg of []</span>
 {[<span style="color: #ad7fa8;">"path"</span>,name], your_module, []}.
 </pre>
 
@@ -377,7 +389,7 @@
 </div>
 
 <div id="outline-container-19" class="outline-2">
-<h2 id="sec-19">a barebones resource</h2>
+<h2 id="sec-19">a bare bones resource</h2>
 <div class="outline-text-2" id="text-19">
 
 
@@ -387,10 +399,14 @@
 
 
 
-<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">init</span>([]) -&gt;<span style="color: #edd400; font-weight: bold;"> </span>{ok, #<span style="font-weight: bold;">state</span>{}}.
+<pre class="src src-erlang"><span style="color: #edd400; font-weight: bold;">init</span>([]) -&gt;<span style="color: #edd400; font-weight: bold;"> </span>{ok, undefined}.
 
 <span style="color: #edd400; font-weight: bold;">to_html</span>(<span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>) -&gt;
-    {<span style="color: #ad7fa8;">"&lt;html&gt;&lt;body&gt;Hello, new world&lt;/body&gt;&lt;/html&gt;"</span>, <span style="color: #ef2929;">ReqData</span>, <span style="color: #ef2929;">State</span>}.
+    {
+      <span style="color: #ad7fa8;">"&lt;html&gt;&lt;body&gt;Hello, new world&lt;/body&gt;&lt;/html&gt;"</span>,
+      <span style="color: #ef2929;">ReqData</span>,
+      <span style="color: #ef2929;">State</span>
+    }.
 
 </pre>
 
@@ -400,8 +416,34 @@
 </div>
 
 <div id="outline-container-20" class="outline-2">
-<h2 id="sec-20">what is available?</h2>
+<h2 id="sec-20">consistent interface</h2>
 <div class="outline-text-2" id="text-20">
+
+
+<ul>
+<li>all resource funs take two args request record and State
+</li>
+<li>all resource funs return a three element tuple
+<ol>
+<li>resource specific response, usually true/false
+</li>
+<li>Request Response record
+</li>
+<li>State
+</li>
+</ol>
+
+</li>
+</ul>
+
+
+</div>
+
+</div>
+
+<div id="outline-container-21" class="outline-2">
+<h2 id="sec-21">what is available?</h2>
+<div class="outline-text-2" id="text-21">
 
 
 <table border="2" cellspacing="0" cellpadding="6" rules="groups" frame="hsides">
@@ -425,9 +467,9 @@
 
 </div>
 
-<div id="outline-container-21" class="outline-2">
-<h2 id="sec-21">making it speak json</h2>
-<div class="outline-text-2" id="text-21">
+<div id="outline-container-22" class="outline-2">
+<h2 id="sec-22">making it speak json</h2>
+<div class="outline-text-2" id="text-22">
 
 
 <p>
@@ -448,9 +490,9 @@
 
 </div>
 
-<div id="outline-container-22" class="outline-2">
-<h2 id="sec-22">what can it do?</h2>
-<div class="outline-text-2" id="text-22">
+<div id="outline-container-23" class="outline-2">
+<h2 id="sec-23">what can it do?</h2>
+<div class="outline-text-2" id="text-23">
 
 
 <p>
@@ -468,9 +510,9 @@
 
 </div>
 
-<div id="outline-container-23" class="outline-2">
-<h2 id="sec-23">authentication</h2>
-<div class="outline-text-2" id="text-23">
+<div id="outline-container-24" class="outline-2">
+<h2 id="sec-24">authentication</h2>
+<div class="outline-text-2" id="text-24">
 
 
 
@@ -487,9 +529,9 @@
 
 </div>
 
-<div id="outline-container-24" class="outline-2">
-<h2 id="sec-24">does it exist?</h2>
-<div class="outline-text-2" id="text-24">
+<div id="outline-container-25" class="outline-2">
+<h2 id="sec-25">does it exist?</h2>
+<div class="outline-text-2" id="text-25">
 
 
 
@@ -508,9 +550,9 @@
 
 </div>
 
-<div id="outline-container-25" class="outline-2">
-<h2 id="sec-25">send it back</h2>
-<div class="outline-text-2" id="text-25">
+<div id="outline-container-26" class="outline-2">
+<h2 id="sec-26">send it back</h2>
+<div class="outline-text-2" id="text-26">
 
 
 
@@ -535,9 +577,9 @@
 
 </div>
 
-<div id="outline-container-26" class="outline-2">
-<h2 id="sec-26">receiving data</h2>
-<div class="outline-text-2" id="text-26">
+<div id="outline-container-27" class="outline-2">
+<h2 id="sec-27">receiving data</h2>
+<div class="outline-text-2" id="text-27">
 
 
 
@@ -552,9 +594,9 @@
 
 </div>
 
-<div id="outline-container-27" class="outline-2">
-<h2 id="sec-27">is it good?</h2>
-<div class="outline-text-2" id="text-27">
+<div id="outline-container-28" class="outline-2">
+<h2 id="sec-28">is it good?</h2>
+<div class="outline-text-2" id="text-28">
 
 
 
@@ -582,9 +624,9 @@
 
 </div>
 
-<div id="outline-container-28" class="outline-2">
-<h2 id="sec-28">store it</h2>
-<div class="outline-text-2" id="text-28">
+<div id="outline-container-29" class="outline-2">
+<h2 id="sec-29">store it</h2>
+<div class="outline-text-2" id="text-29">
 
 
 
@@ -611,9 +653,9 @@
 
 </div>
 
-<div id="outline-container-29" class="outline-2">
-<h2 id="sec-29">oops, lets delete that</h2>
-<div class="outline-text-2" id="text-29">
+<div id="outline-container-30" class="outline-2">
+<h2 id="sec-30">oops, lets delete that</h2>
+<div class="outline-text-2" id="text-30">
 
 
 
@@ -634,9 +676,9 @@
 
 </div>
 
-<div id="outline-container-30" class="outline-2">
-<h2 id="sec-30">tracing is pretty (useful)</h2>
-<div class="outline-text-2" id="text-30">
+<div id="outline-container-31" class="outline-2">
+<h2 id="sec-31">tracing is pretty (useful)</h2>
+<div class="outline-text-2" id="text-31">
 
 
 <p>

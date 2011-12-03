@@ -7,7 +7,10 @@
 
 -include_lib("webmachine/include/webmachine.hrl").
 
-init([]) -> {ok, undefined}.
+init([]) -> {ok, undefined};
+init([trace]) ->
+    {ok, Cwd} = file:get_cwd(),
+    {{trace, filename:join([Cwd,"trace"])},undefined}.
 
 to_html(ReqData, State) ->
     {"<html><body>Hello, new world</body></html>", ReqData, State}.

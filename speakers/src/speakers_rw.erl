@@ -1,6 +1,7 @@
-%% @author author <author@example.com>
-%% @copyright YYYY author.
-%% @doc Example webmachine_resource.
+%% @author Justin Kirby <jkirby@voalte.com>
+%% @copyright 2011 Justin Kirby.
+%% @doc ErlangDC PUT,DELETE example, comments relect differences from
+%% speakers_ro.erl
 
 -module(speakers_rw).
 -export([init/1,
@@ -17,36 +18,43 @@
 -include_lib("webmachine/include/webmachine.hrl").
 -include("speakers.hrl").
 
-%% this is the init fun called when a webmachine decides to dispatch
-%% to this module based on informaiton from the dispatch.conf. The
-%% second element in the tuple is the state/context that is passed as
-%% the second param to the other funs, e.g. state
+%% same as speakers_ro
 init([]) ->
     {ok, undefined};
 init([trace]) ->
     {ok, Cwd} = file:get_cwd(),
     {{trace, filename:join([Cwd,"trace"])},undefined}.
 
-%% restrict the allowable methods to just GET
+%% added 'PUT' and 'DELETE', otherwise a PUT request would be
+%% responded to with 405 Method Not Allowed
 allowed_methods(ReqData, State) ->
     ?TRACE(allowed_methods,"~p~n",[wrq:method(ReqData)]),
     {['GET','PUT', 'DELETE'], ReqData, State}.
 
-%% only support json and map that to to_json/2
+%% same as speakers_ro
 content_types_provided(ReqData, State) ->
     ?TRACE(content_types_provided,"",[]),
     {[{"application/json", to_json}], ReqData, State}.
 
-%% only support accepting json data and map that to from_json/2
+%% This lists the mimetypes we accept, there can be more than one. WM
+%% will try to match with what is provided in Content-Type header. If
+%% no match then an error is returned. If the client did specify a
+%% Content-Type that is listed here, then the corresponding function
+%% will be the ultimate destination, assuming all other paths are
+%% successful. Note that from_json may never be called, just like
+%% to_json in content_types_provided.
 content_types_accepted(ReqData, State) ->
     ?TRACE(content_types_accepted,"",[]),
     {[{"application/json", from_json}], ReqData, State}.
 
 
 %% determine whether a resource exists. if not then return false. if
-%% it does return true. Note that if the name is undefined, it was not
-%% specified so return a list of all url paths. which means this
-%% resource ALWAYS exists, even if empty
+%% it does exist, return true. Note that if the name is undefined, it
+%% was not specified so return a list of all url paths. which means
+%% this resource ALWAYS exists, even if empty.
+%%
+%% Also this can come into play with POST and post_is_create. That can
+%% get really confusing so I am avoiding it in this example.
 resource_exists(ReqData, State) ->
     case wrq:path_info(name, ReqData) of
         undefined ->
@@ -59,35 +67,58 @@ resource_exists(ReqData, State) ->
     end.
 
 
+%% use whatever semantics your app requires to determine if the
+%% request is valid here. This should really just focus on the data
+%% coming in, i.e validating the body if it exists and/or looking at
+%% query params.
+%%
+%% if the data is valid you should return false, i.e. it is NOT
+%% malformed.  returning true here means that this IS a malformed
+%% request. And the client will get a 400 Bad Request response.
 malformed_request(ReqData, State) ->
     ?TRACE(malformed_request,"",[]),
     case wrq:method(ReqData) of
         'PUT' ->
             case wrq:req_body(ReqData) of
                 <<>> ->
+                    %% if this is a PUT and no body, bad bad
                     {true, ReqData, State};
                 Body ->
-                    ?DEBUG("body: ~p~n",[Body]),
+                    %%We have a body! make sure it is sane json
                     case mochijson2:decode(Body) of
                         {struct, Pl} ->
+
+                            %% w00t sane json, now is all the data there?
                             Valid = not speakers_model:validate(Pl),
+
                             {Valid, ReqData, State};
                         _ ->
+                            %% bad json, bad client, thwap
                             {true,ReqData, State}
                     end
             end;
         'DELETE' ->
+            %% we validate the delete request in that the client
+            %% should delete a resource, not the 'collection'
             case wrq:path_info(name, ReqData) of
                 undefined ->
+                    %% the client tried to delete /speakers. This
+                    %% makes no sense.
                     {true, ReqData, State};
                 _ ->
+                    %% the client is trying to delete a
+                    %% /speakers/NAME, good
                     {false, ReqData, State}
             end;
         _ ->
+            %% HEAD,OPTIONS,PATCH,BOB,GET do not care about.
             {false, ReqData, State}
     end.
 
 
+
+%% is the wrq:method/1 is DELETE WM will end up here. This is where
+%% the actual operation should be performed.
 delete_resource(ReqData, State) ->
     ?TRACE(delete_resource,"",[]),
     Name = wrq:path_info(name, ReqData),

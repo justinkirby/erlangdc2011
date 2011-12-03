@@ -232,48 +232,48 @@ fake_data() ->
     [
      #speakers{name = "Francesco Cesarini",
                talk = "Morning Bootcamp: Practical Erlang Programming",
-               start = "Sat, 02 Dec 2011 09:00:00",
-               'end' = "Sat, 02 Dec 2011 12:00:00"
+               start = "Sat, 03 Dec 2011 09:00:00",
+               'end' = "Sat, 03 Dec 2011 12:00:00"
               },
      #speakers{name = "Colin MacDonald",
                talk = "Crafty Erlang - An Elegant Tool for Small Projects",
-               start = "Sat, 02 Dec 2011 13:10:00",
-               'end' = "Sat, 02 Dec 2011 13:40:00"
+               start = "Sat, 03 Dec 2011 13:10:00",
+               'end' = "Sat, 03 Dec 2011 13:40:00"
               },
      #speakers{name = "Eric Merritt",
                talk = "Building Enterprise Erlang Applications with Sinan",
-               start = "Sat, 02 Dec 2011 14:10:00",
-               'end' = "Sat, 02 Dec 2011 14:40:00"
+               start = "Sat, 03 Dec 2011 14:10:00",
+               'end' = "Sat, 03 Dec 2011 14:40:00"
               },
      #speakers{name = "Paul Davis",
                talk = "Erlang in Production",
-               start = "Sat, 02 Dec 2011 16:10:00",
-               'end' = "Sat, 02 Dec 2011 16:40:00"
+               start = "Sat, 03 Dec 2011 16:10:00",
+               'end' = "Sat, 03 Dec 2011 16:40:00"
               },
      #speakers{name = "Rusty Klophaus",
                talk = "Everybody Polyglot!",
-               start = "Sat, 02 Dec 2011 15:40:00",
-               'end' = "Sat, 02 Dec 2011 16:10:00"
+               start = "Sat, 03 Dec 2011 15:40:00",
+               'end' = "Sat, 03 Dec 2011 16:10:00"
               },
      #speakers{name = "Ryan Zezeski",
                talk = "From Java to Erlang",
-               start = "Sat, 02 Dec 2011 13:40:00",
-               'end' = "Sat, 02 Dec 2011 14:10:00"
+               start = "Sat, 03 Dec 2011 13:40:00",
+               'end' = "Sat, 03 Dec 2011 14:10:00"
               },
      #speakers{name = "Bryan Hunter",
                talk = "Erlang for C# Developers",
-               start = "Sat, 02 Dec 2011 17:00:00",
-               'end' = "Sat, 02 Dec 2011 17:30:00"
+               start = "Sat, 03 Dec 2011 17:00:00",
+               'end' = "Sat, 03 Dec 2011 17:30:00"
               },
      #speakers{name = "Yurii Rashkovskii",
                talk = "Deploying Erlang Applications",
-               start = "Sat, 02 Dec 2011 17:40:00",
-               'end' = "Sat, 02 Dec 2011 18:10:00"
+               start = "Sat, 03 Dec 2011 17:40:00",
+               'end' = "Sat, 03 Dec 2011 18:10:00"
               },
      #speakers{name = "Justin Kirby",
                talk = "Making erlang speak REST using Webmachine",
-               start = "Sat, 02 Dec 2011 15:00:00",
-               'end' = "Sat, 02 Dec 2011 16:40:00"
+               start = "Sat, 03 Dec 2011 15:00:00",
+               'end' = "Sat, 03 Dec 2011 16:40:00"
               }
     ].
 
