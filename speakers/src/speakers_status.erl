@@ -52,8 +52,6 @@ make_status(Pl) ->
     End = date_secs(proplists:get_value(<<"end">>,Pl)),
     Start = date_secs(proplists:get_value(<<"start">>,Pl)),
 
-    ?DEBUG("start: ~p  end: ~p now: ~p~n",[Start, End,Now]),
-
     Status = case Start > Now of
                  true ->
                      waiting;
