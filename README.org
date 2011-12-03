@@ -1,0 +1,96 @@
+
+
+This repo contains the presentation that I did for erlangdc 2011. The
+goal is a $0.25 tour of Webmachine in 30min.
+
+* Presentation.
+
+  The presentation dir holds the src orgmode file used to generate the
+  s5 html.
+
+  The following is the 'org-publish-project-alist that I used to
+  generate the html. If you want to edit the presentation you will
+  have to
+  1. adjust paths accordingly
+  2. eval the following project-alist in your emacs
+  3. open presentation/erlangdc.org
+  4. edit
+  5. C-c C-e P  (publish)
+
+  The new erlangdc.html file can be found in presentation/html/
+
+
+  #+begin_src elisp
+    (setq org-publish-project-alist
+          '(("erlangdc"
+             :publishing-directory "~/prj/erlangdc/presentation/html"
+             :base-directory "~/prj/erlangdc/presentation/"
+             :publishing-function org-publish-org-to-html
+             :org-export-html-preamble "<div class='layout'><div id='controls'></div><div id='currentSlide'></div><div id='header'>%s</div><div id='footer'>%s</div></div><div class='presentation'><div class='slide front'>  <div id='front-logo'></div><h1 class='front'></h1><h3></h3></div>"
+             :org-export-html-postamble "</div>"
+             :sub-superscript nil
+             )))
+  #+end_src
+
+
+* Webmachine Demo
+
+  the webmachine app in speakers dir is a simple json demo. The goal
+  is to provide as simple of a demo as possible. I wanted to
+  demonstrate
+  - GET a single resource
+  - GET a list of resources
+  - PUT a resource
+  - DELETE a resource
+  - GET on calculated data that is more than just data storage
+
+** speakers_resource.erl
+   This is the generated resource, about as simple as it gets.
+
+** speakers_ro.erl Read Only
+
+   This resource demos reading data from a very primitive data
+   model. It shows how the following work
+   - use paths in dispatch.conf
+   - named variables in dispatch.conf
+   - properly provide json data
+   - use resource_exists/2 to provide 404
+   - build and send json data
+
+** speakers_rw.erl Read Write
+
+   This resource adds the ability to PUT data and DELETE a resource.
+
+
+   - edit allowed_methods/2 to accept PUT and DELETE
+   - content_types_accepted/2 to accept json data
+   - use malformed_request/2 to validate data
+   - delete_resource/2 to delete data
+
+** speakers_status.erl Status
+
+   This resource returns a list of paths based on status of the
+   speaker.
+
+   It is intended as an example of calculating data. In other words
+   something more than just writing and fetching to a db.
+
+
+** starting
+
+   simply cd into the speakers dir and run start.sh
+
+
+** tracing
+
+   to enable tracing you need to add the path in the dispatcher. I
+   provided a shortcut in the speakers module.
+
+   on the prompt provided by start.sh type the following to enable
+   tracing
+   #+begin_src erlang
+   speakers:trace().
+   #+end_src
+
+   Then visit [[http://localhost:8000/wmtrace]]
+
