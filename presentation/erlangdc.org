@@ -314,3 +314,9 @@
   #+end_src
 
   Visit [[http://localhost:8000/wmtrace]]
+
+* Thanks
+
+  - Justin Sheehy
+  - Basho [[http://basho.com]]
+  - Voalte [[http://www.voalte.com]]
